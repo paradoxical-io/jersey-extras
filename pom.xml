@@ -9,7 +9,7 @@
     
     <groupId>io.paradoxical</groupId>
     <artifactId>common-web</artifactId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <name>common-web</name>
