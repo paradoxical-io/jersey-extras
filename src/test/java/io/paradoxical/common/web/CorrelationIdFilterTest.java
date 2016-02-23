@@ -1,9 +1,11 @@
 package io.paradoxical.common.web;
 
 
-import io.paradoxical.common.web.web.WebRequestContext;
+import io.paradoxical.common.web.web.CorrelationRequestContext;
+import io.paradoxical.common.web.web.filter.ContextAttributeKeys;
 import io.paradoxical.common.web.web.filter.CorrelationIdFilter;
-import io.paradoxical.common.web.web.filter.FilterAttributes;
+import io.paradoxical.common.web.web.filter.LoggingProperties;
+import io.paradoxical.common.web.web.filter.WellKnownHeaders;
 import org.apache.log4j.MDC;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -23,6 +25,7 @@ import static org.junit.Assert.assertNull;
 public class CorrelationIdFilterTest extends JerseyTest {
 
     private MockHttpServletRequest request = new MockHttpServletRequest();
+    private final static ContextAttributeKeys correlationIdContextKey = ContextAttributeKeys.CorrelationId;
 
     @Override
     protected Application configure() {
@@ -38,17 +41,17 @@ public class CorrelationIdFilterTest extends JerseyTest {
 
     @Test
     public void test_no_domain_context() {
-        assertNull(request.getAttribute(FilterAttributes.CONTEXT));
+        assertNull(request.getAttribute(correlationIdContextKey.key()));
         target().path("test").request().get();
-        assertNotNull(request.getAttribute(FilterAttributes.CONTEXT));
+        assertNotNull(request.getAttribute(correlationIdContextKey.key()));
     }
 
     @Test
     public void test_with_domain_context() {
-        WebRequestContext context = new WebRequestContext();
-        request.setAttribute(FilterAttributes.CONTEXT, context);
+        CorrelationRequestContext context = new CorrelationRequestContext();
+        request.setAttribute(correlationIdContextKey.key(), context);
         target().path("test").request().get();
-        assertNotNull(request.getAttribute(FilterAttributes.CONTEXT));
+        assertNotNull(request.getAttribute(correlationIdContextKey.key()));
         //When domain context has more fields we can verify that those fields stayed in tack.
     }
 
@@ -60,20 +63,22 @@ public class CorrelationIdFilterTest extends JerseyTest {
 
     @Test
     public void test_header_contains_corrid() {
-        request.addHeader(FilterAttributes.CORRELATION_ID_HEADER, "8ef3a75e-cddb-48b6-83d6-d3377e068831");
+        final String testCorrelationId = "8ef3a75e-cddb-48b6-83d6-d3377e068831";
+
+        request.addHeader(WellKnownHeaders.CorrelationId.headerName(), testCorrelationId);
         target().path("test").request().get();
-        assertThat(request.getAttribute(FilterAttributes.CONTEXT)).isInstanceOf(WebRequestContext.class);
+        assertThat(request.getAttribute(correlationIdContextKey.key())).isInstanceOf(CorrelationRequestContext.class);
 
-        WebRequestContext context = (WebRequestContext) request.getAttribute(FilterAttributes.CONTEXT);
+        CorrelationRequestContext context = (CorrelationRequestContext) request.getAttribute(correlationIdContextKey.key());
 
-        assertThat(context.getCorrId().toString()).isEqualTo("8ef3a75e-cddb-48b6-83d6-d3377e068831");
+        assertThat(context.getCorrelationId().toString()).isEqualTo(testCorrelationId);
     }
 
     @Path("test")
     public static class Resource {
         @GET
         public String getTest() {
-            return MDC.get(FilterAttributes.CORR_ID).toString();
+            return MDC.get(LoggingProperties.CORR_ID).toString();
         }
     }
 

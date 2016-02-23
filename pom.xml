@@ -8,7 +8,7 @@
     </prerequisites>
     
     <groupId>io.paradoxical</groupId>
-    <artifactId>common-web</artifactId>
+    <artifactId>jersey-extras</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>Jersey utilities</description>
@@ -91,19 +91,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.paradoxical</groupId>
-            <artifactId>common</artifactId>
-            <version>${paradoxical.common.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${jersey.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>4.0</version>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

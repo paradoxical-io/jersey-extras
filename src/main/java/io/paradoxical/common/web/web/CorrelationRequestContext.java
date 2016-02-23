@@ -5,10 +5,10 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-public class WebRequestContext {
+public class CorrelationRequestContext {
 
 	@Getter
 	@Setter
-	private UUID corrId;
+	private UUID correlationId;
 	
 }

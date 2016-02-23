@@ -1,6 +1,6 @@
 package io.paradoxical.common.web.web.filter;
 
-import io.paradoxical.common.web.web.WebRequestContext;
+import io.paradoxical.common.web.web.CorrelationRequestContext;
 import org.slf4j.MDC;
 
 import javax.annotation.Priority;
@@ -18,7 +18,18 @@ import java.util.UUID;
 @Priority(Integer.MIN_VALUE)
 public class CorrelationIdFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
+    private final NamedRequestHeader correlationIdHeaderName;
     @Context private HttpServletRequest request;
+
+    @SuppressWarnings("unused")
+    public CorrelationIdFilter() {
+        this(WellKnownHeaders.CorrelationId);
+    }
+
+    public CorrelationIdFilter(NamedRequestHeader correlationIdHeaderName) {
+        this.correlationIdHeaderName = correlationIdHeaderName;
+    }
+
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -27,11 +38,13 @@ public class CorrelationIdFilter implements ContainerRequestFilter, ContainerRes
             return;
         }
 
-        if (request.getAttribute(FilterAttributes.CONTEXT) == null) {
-            setCorrelationId(new WebRequestContext());
+        final Object requestAttribute = request.getAttribute(ContextAttributeKeys.CorrelationId.key());
+
+        if (requestAttribute == null) {
+            setCorrelationId(new CorrelationRequestContext());
         }
-        else if (request.getAttribute(FilterAttributes.CONTEXT) instanceof WebRequestContext) {
-            setCorrelationId((WebRequestContext) request.getAttribute(FilterAttributes.CONTEXT));
+        else if (requestAttribute instanceof CorrelationRequestContext) {
+            setCorrelationId((CorrelationRequestContext) requestAttribute);
         }
     }
 
@@ -45,14 +58,16 @@ public class CorrelationIdFilter implements ContainerRequestFilter, ContainerRes
          */
     }
 
-    private void setCorrelationId(WebRequestContext domainContext) {
-        UUID corrId = request.getHeader(FilterAttributes.CORRELATION_ID_HEADER) ==
-                      null ? UUID.randomUUID() : UUID.fromString(request.getHeader(FilterAttributes.CORRELATION_ID_HEADER));
-        domainContext.setCorrId(corrId);
+    private void setCorrelationId(CorrelationRequestContext domainContext) {
+        final String requestHeader = request.getHeader(correlationIdHeaderName.headerName());
 
-        request.setAttribute(FilterAttributes.CONTEXT, domainContext);
+        UUID corrId = requestHeader == null ? UUID.randomUUID() : UUID.fromString(requestHeader);
 
-        MDC.put(FilterAttributes.CORR_ID, domainContext.getCorrId().toString());
+        domainContext.setCorrelationId(corrId);
+
+        request.setAttribute(ContextAttributeKeys.CorrelationId.key(), domainContext);
+
+        MDC.put(LoggingProperties.CORR_ID, domainContext.getCorrelationId().toString());
     }
 }
 

@@ -1,14 +1,13 @@
 package io.paradoxical.common.web.web.filter;
 
-import com.google.inject.Inject;
-import io.paradoxical.common.interfaces.CorrelationIdGetter;
-import io.paradoxical.common.web.web.WebRequestContext;
+import io.paradoxical.common.web.web.CorrelationRequestContext;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 
-public class ContextProvider implements CorrelationIdGetter {
+public class ContextProvider {
 
     private HttpServletRequest context;
 
@@ -17,20 +16,17 @@ public class ContextProvider implements CorrelationIdGetter {
         this.context = context;
     }
 
-    public WebRequestContext getContext() {
-        return context == null || !(context.getAttribute(FilterAttributes.CONTEXT) instanceof WebRequestContext) ?
-               null : (WebRequestContext) context.getAttribute(FilterAttributes.CONTEXT);
-    }
-
     public UUID getCorrelationId() {
         if (context == null) {
             return null;
         }
-        if (!(context.getAttribute(FilterAttributes.CONTEXT) instanceof WebRequestContext)) {
+
+        final Object contextAttribute = context.getAttribute(ContextAttributeKeys.CorrelationId.key());
+
+        if (!(contextAttribute instanceof CorrelationRequestContext)) {
             return null;
         }
 
-        return ((WebRequestContext) context.getAttribute(FilterAttributes.CONTEXT)).getCorrId();
+        return ((CorrelationRequestContext) contextAttribute).getCorrelationId();
     }
-
 }
