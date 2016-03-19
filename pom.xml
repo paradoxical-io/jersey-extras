@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
     <description>Jersey utilities</description>
     
-    <name>common-web</name>
+    <name>jersey-extras</name>
     <url>http://maven.apache.org</url>
 
     <licenses>
