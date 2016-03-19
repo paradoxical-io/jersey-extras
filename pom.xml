@@ -25,7 +25,7 @@
     </licenses>
 
     <properties>
-        <gpg.password>${env.GPG_PASSWORD}</gpg.password>
+        <gpg.passphrase>${env.GPG_PASSWORD}</gpg.passphrase>
         <slf4j.version>1.7.10</slf4j.version>
         <lombok.version>1.16.2</lombok.version>
         <reflectasm.version>1.10.0</reflectasm.version>
