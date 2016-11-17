@@ -1,4 +1,4 @@
-package io.paradoxical.common.web.web.filter;
+package io.paradoxical.jersey.extras.filters;
 
 import com.godaddy.logging.Logger;
 
@@ -16,7 +16,8 @@ public class IpRequestLoggingFilter implements ContainerRequestFilter {
     private static final Logger logger = getLogger(IpRequestLoggingFilter.class);
     private final Consumer<HttpServletRequest> requestProcessor;
 
-    @Context private HttpServletRequest request;
+    @Context
+    private HttpServletRequest request;
 
     public IpRequestLoggingFilter() {
         this(r -> logger.with("remote-addr", r.getRemoteAddr())
@@ -28,12 +29,13 @@ public class IpRequestLoggingFilter implements ContainerRequestFilter {
         this.requestProcessor = requestProcessor;
     }
 
-    @Override public void filter(final ContainerRequestContext requestContext) throws IOException {
+    @Override
+    public void filter(final ContainerRequestContext requestContext) throws IOException {
         if (request == null) {
             return;
         }
 
-        if(requestProcessor == null){
+        if (requestProcessor == null) {
             return;
         }
 

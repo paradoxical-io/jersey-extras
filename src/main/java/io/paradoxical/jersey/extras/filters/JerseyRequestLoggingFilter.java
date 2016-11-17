@@ -1,4 +1,4 @@
-package io.paradoxical.common.web.web.filter;
+package io.paradoxical.jersey.extras.filters;
 
 import org.glassfish.jersey.filter.LoggingFilter;
 
@@ -25,22 +25,23 @@ import java.util.List;
  */
 @PreMatching
 @Priority(Integer.MIN_VALUE + 1)
-public class JerseyRequestLogging implements ContainerRequestFilter, ClientRequestFilter, ContainerResponseFilter,
-                                             ClientResponseFilter, WriterInterceptor {
+public class JerseyRequestLoggingFilter implements ContainerRequestFilter, ClientRequestFilter, ContainerResponseFilter,
+                                                   ClientResponseFilter, WriterInterceptor {
     private final List<String> pathExcludes;
 
     private LoggingFilter nativeFilter;
 
-    public JerseyRequestLogging(String... pathExcludes) {
+    public JerseyRequestLoggingFilter(String... pathExcludes) {
         this(Arrays.asList(pathExcludes));
     }
 
-    public JerseyRequestLogging(List<String> pathExcludes) {
+    public JerseyRequestLoggingFilter(List<String> pathExcludes) {
         nativeFilter = new LoggingFilter(java.util.logging.Logger.getLogger(LoggingFilter.class.getName()), true);
         this.pathExcludes = pathExcludes;
     }
 
-    @Override public void filter(final ClientRequestContext context) throws IOException {
+    @Override
+    public void filter(final ClientRequestContext context) throws IOException {
         if (!isEmpty(pathExcludes) && pathExcludes.stream().anyMatch(i -> i.startsWith(context.getUri().getPath()))) {
             return;
         }
@@ -48,7 +49,8 @@ public class JerseyRequestLogging implements ContainerRequestFilter, ClientReque
         nativeFilter.filter(context);
     }
 
-    @Override public void filter(final ContainerRequestContext context) throws IOException {
+    @Override
+    public void filter(final ContainerRequestContext context) throws IOException {
         if (!isEmpty(pathExcludes) && pathExcludes.stream().anyMatch(i -> i.startsWith(context.getUriInfo().getPath()))) {
             return;
         }
@@ -56,7 +58,8 @@ public class JerseyRequestLogging implements ContainerRequestFilter, ClientReque
         nativeFilter.filter(context);
     }
 
-    @Override public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
+    @Override
+    public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
         if (!isEmpty(pathExcludes) && pathExcludes.stream().anyMatch(i -> i.startsWith(requestContext.getUriInfo().getPath()))) {
             return;
         }
@@ -64,7 +67,8 @@ public class JerseyRequestLogging implements ContainerRequestFilter, ClientReque
         nativeFilter.filter(requestContext, responseContext);
     }
 
-    @Override public void filter(final ClientRequestContext requestContext, final ClientResponseContext responseContext) throws IOException {
+    @Override
+    public void filter(final ClientRequestContext requestContext, final ClientResponseContext responseContext) throws IOException {
         if (!isEmpty(pathExcludes) && pathExcludes.stream().anyMatch(i -> i.startsWith(requestContext.getUri().getPath()))) {
             return;
         }
@@ -72,7 +76,8 @@ public class JerseyRequestLogging implements ContainerRequestFilter, ClientReque
         nativeFilter.filter(requestContext, responseContext);
     }
 
-    @Override public void aroundWriteTo(final WriterInterceptorContext context) throws IOException, WebApplicationException {
+    @Override
+    public void aroundWriteTo(final WriterInterceptorContext context) throws IOException, WebApplicationException {
         nativeFilter.aroundWriteTo(context);
     }
 

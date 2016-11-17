@@ -1,4 +1,4 @@
-package io.paradoxical.common.web.web.filter;
+package io.paradoxical.jersey.extras;
 
 public enum WellKnownHeaders implements NamedRequestHeader {
     CorrelationId("X-CorrelationId");
