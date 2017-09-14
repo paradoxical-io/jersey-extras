@@ -3,7 +3,6 @@ package io.paradoxical.jersey.extras.filters;
 
 import io.paradoxical.jersey.extras.WellKnownHeaders;
 import org.apache.log4j.MDC;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
@@ -56,7 +55,7 @@ public class CorrelationIdFilterTest extends JerseyTest {
     public static class Resource {
         @GET
         public String getTest() {
-            return MDC.get(CorrelationIdFilter.LoggingProperties.CORR_ID)
+            return MDC.get(CorrelationIdFilter.LoggingProperties.DEFAULT_CORRELATION_ID_KEY)
                       .toString();
         }
     }

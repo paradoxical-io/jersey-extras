@@ -6,6 +6,7 @@ import io.paradoxical.jersey.extras.ContextProperties;
 import io.paradoxical.jersey.extras.NamedRequestHeader;
 import io.paradoxical.jersey.extras.WellKnownHeaders;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import org.slf4j.MDC;
 
@@ -27,14 +28,24 @@ public class CorrelationIdFilter implements ContainerRequestFilter, ContainerRes
     private static final Logger logger = getLogger(CorrelationIdFilter.class);
 
     private final NamedRequestHeader correlationIdHeaderName;
+    private final String correlationIdLoggingKey;
 
     @SuppressWarnings("unused")
     public CorrelationIdFilter() {
-        this(WellKnownHeaders.CorrelationId);
+        this(WellKnownHeaders.CorrelationId, LoggingProperties.DEFAULT_CORRELATION_ID_KEY);
+    }
+
+    public CorrelationIdFilter(String correlationIdLoggingKey) {
+        this(WellKnownHeaders.CorrelationId, correlationIdLoggingKey);
     }
 
     public CorrelationIdFilter(NamedRequestHeader correlationIdHeaderName) {
+        this(correlationIdHeaderName, LoggingProperties.DEFAULT_CORRELATION_ID_KEY);
+    }
+
+    public CorrelationIdFilter(@NonNull NamedRequestHeader correlationIdHeaderName, @NonNull String correlationIdLoggingKey) {
         this.correlationIdHeaderName = correlationIdHeaderName;
+        this.correlationIdLoggingKey = correlationIdLoggingKey;
     }
 
     public static UUID lookupCorrelationId(ContainerRequestContext context) {
@@ -99,7 +110,7 @@ public class CorrelationIdFilter implements ContainerRequestFilter, ContainerRes
 
         requestContext.setProperty(ContextProperties.CorrelationId.key(), correlationContext);
 
-        MDC.put(LoggingProperties.CORR_ID, correlationContext.getCorrelationId().toString());
+        MDC.put(correlationIdLoggingKey, correlationContext.getCorrelationId().toString());
     }
 
     private UUID tryParseCorrelationId(final String requestHeader) {
@@ -129,7 +140,7 @@ public class CorrelationIdFilter implements ContainerRequestFilter, ContainerRes
         private LoggingProperties() {
         }
 
-        public static final String CORR_ID = "corrId";
+        public static final String DEFAULT_CORRELATION_ID_KEY = "corrId";
     }
 }
 
